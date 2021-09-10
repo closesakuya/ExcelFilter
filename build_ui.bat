@@ -1,0 +1,1 @@
+pyinstaller -i res/main.ico -D build_ui.spec
