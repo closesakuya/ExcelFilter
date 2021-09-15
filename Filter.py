@@ -27,7 +27,7 @@ class FilterType:
         else:
             pt = pt.split('\n')
         for m_item in pt:
-            if raw and m_item.strip() == raw.strip():
+            if raw and str(m_item).strip() == str(raw).strip():
                 return True
         return False
 
@@ -35,7 +35,7 @@ class FilterType:
     def check_reg_exp(raw: str, pt: re.Pattern) -> bool:
         if not raw:
             return False
-        if re.search(pt, raw.strip()):
+        if re.search(pt, str(raw).strip()):
             return True
         return False
 
@@ -46,7 +46,6 @@ class FilterType:
         # exp = pt.replace('X', str(raw).strip())
         exp = pt
         try:
-
             ret = eval(exp)
             return ret
         except Exception as e:
