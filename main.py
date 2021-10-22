@@ -248,12 +248,16 @@ class UI(QMainWindow, Ui_water_mainwd):
         else:
             dst = self.sel_output_lbl.text() + os.sep + output_file_name
         src = self.sel_input_lbl.text()
-        ai = get_input_tab_by_filename(src)(
-            src, data_pos=(int(self.data_start_row.text()) - 1, int(self.data_start_column.text()) - 1),
-            title_pos=(int(self.title_start_row.text()) - 1, int(self.title_start_column.text()) - 1))
+        try:
+            ai = get_input_tab_by_filename(src)(
+                src, data_pos=(int(self.data_start_row.text()) - 1, int(self.data_start_column.text()) - 1),
+                title_pos=(int(self.title_start_row.text()) - 1, int(self.title_start_column.text()) - 1))
+        except Exception as e:
+            self.log_msg(e.__str__())
+            return
         for i in range(self.filter_num):
-            if self.__getattribute__("filter_input_{0}".format(i+1)).toPlainText():
-                filter_txt = self.__getattribute__("filter_input_{0}".format(i+1)).toPlainText()
+            filter_txt = self.__getattribute__("filter_input_{0}".format(i + 1)).toPlainText().strip()
+            if filter_txt:
                 if self.__getattribute__("sel_btn_lst_{0}".format(i+1)).isChecked():
                     filter_type = FilterType.raw_list
                 elif self.__getattribute__("sel_btn_py_{0}".format(i+1)).isChecked():

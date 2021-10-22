@@ -8,12 +8,16 @@ import time
 from typing import List, Tuple
 import abc
 from datetime import datetime, date, timedelta
+import logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 
 class FilterType:
     raw_list = 0
     py_exp = 1
     reg_exp = 2
+    __raw_list_cache = {}
 
     @classmethod
     def check(cls, filter_type: int, raw: str, pt: str) -> bool:
@@ -21,14 +25,25 @@ class FilterType:
 
     @staticmethod
     def check_raw_list(raw: str, pt: str) -> bool:
-        pt = pt.strip()
-        if re.search(r'\t', pt):
-            pt = pt.split('\t')
+        if FilterType.__raw_list_cache.get(pt, None) is not None:
+            pt = FilterType.__raw_list_cache[pt]
         else:
-            pt = pt.split('\n')
-        for m_item in pt:
-            if raw and str(m_item).strip() == str(raw).strip():
-                return True
+            raw_pt = pt
+            pt = pt.strip()
+            if re.search(r'\n', pt):
+                pt = pt.split('\n')
+            else:
+                pt = pt.split('\t')
+            FilterType.__raw_list_cache[raw_pt] = {}
+            if isinstance(pt, list):
+                for item in pt:
+                    FilterType.__raw_list_cache[raw_pt][str(item).strip()] = True
+            else:
+                FilterType.__raw_list_cache[raw_pt][str(pt).strip()] = True
+            pt = FilterType.__raw_list_cache[raw_pt]
+
+        if pt.get(str(raw).strip(), False) is True:
+            return True
         return False
 
     @staticmethod
